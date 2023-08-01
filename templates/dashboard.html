@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="static/dashboard.css">
+</head>
+<body>
+    <h1>Welcome, {{ username }}!</h1>
+    <h2>Create a Job</h2>
+    
+    <h1>Job Form</h1>
+    <form method="post" action="{{ url_for('dashboard') }}">
+        <label for="company name">Company Name:</label>
+        <input type="text" id="name" name="name" required><br>
+        <label for="company description">Company Description:</label>
+        <input type="text" id="text" name="text" required><br>
+        <label for="company industry">Company Industry:</label>
+        <input type="text" id="text" name="text" required><br>
+        <label for="job tittle">Job Title:</label>
+        <input type="text" id="text" name="text" required><br>
+        <label for="number of people to hire">Number of people to hire for this job:</label>
+        <input type="number" id="number" name="text" required><br>
+        <label for="where">Where would you like to advertise this job?:</label>
+        <input type="text" id="text" name="text" required><br>
+        <label for="Job Type">What type of a job is it?:</label>
+
+        <select id="job">
+        <option value="full-time">Full-time</option>
+        <option value="part-time">Part-time</option>
+        <option value="temp">Temporary</option>
+        <option value="contract">Contract</option>
+        <option value="internship">Internship</option>
+        <option value="commission">Commission</option>
+        <option value="casual">Casual</option>
+        <option value="permanent">Permanent</option>
+        <option value="leanership">Learnership</option>
+
+        </select>
+        <label for="how long">How long is the contract?:</label>
+        <input type="text" id="name" name="name" required><br>
+        <label for="pay">Salary per month in Rands:</label>
+        <input type="number" id="number" name="number" required><br>
+        <label for="job description">Job Description:</label>
+        <input type="text" id="name" name="name" required><br>
+        
+
+        <!-- Add other fields for the application form as needed -->
+
+        <input type="submit" value="Submit">
+    
+    
+    <h2>Posts</h2>
+    <ul>
+        
+        {% for post in posts %}
+        <li><strong>{{ post.author }}:</strong> {{ post.text }}</li>
+        {% endfor %}
+    </ul>
+    <p><a href="/logout">Logout</a></p>
+</body>
+</html>

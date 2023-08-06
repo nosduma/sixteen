@@ -1,22 +1,23 @@
 from flask import Flask, render_template, request, redirect, url_for, session
-from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'  # Change this to a secure secret key in a real application
 
-# Dummy user and post data (for demonstration purposes)
+# Dummy user data (for demonstration purposes)
 users = {
     'user1': {
         'username': 'user1',
-        'password': generate_password_hash('password1')  # Use generate_password_hash to securely store passwords
+        'password': 'password1'
     }
 }
 
-posts = []
-
 @app.route('/')
 def home():
-    return render_template('index.html')
+    return render_template('home.html')
+
+@app.route('/about')
+def about():
+    return render_template('about.html')
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -29,10 +30,10 @@ def register():
 
         users[username] = {
             'username': username,
-            'password': generate_password_hash(password)
+            'password': password
         }
         session['username'] = username
-        return redirect(url_for('dashboard'))
+        return redirect(url_for('login'))  # Redirect to login page after successful registration
 
     return render_template('register.html')
 
@@ -42,43 +43,45 @@ def login():
         username = request.form['username']
         password = request.form['password']
 
-        if username not in users or not check_password_hash(users[username]['password'], password):
+        if username in users and users[username]['password'] == password:
+            session['username'] = username
+            return redirect(url_for('dashboard'))  # Redirect to dashboard after successful login
+        else:
             return render_template('login.html', message='Invalid username or password.')
-
-        session['username'] = username
-        return redirect(url_for('dashboard'))
 
     return render_template('login.html')
 
 @app.route('/dashboard')
 def dashboard():
     if 'username' in session:
-        return render_template('dashboard.html', username=session['username'], posts=posts)
+        return render_template('dashboard.html', username=session['username'])
     return redirect(url_for('login'))
+
+
+@app.route('/vacancies')
+def vacancies():
+    return render_template('vacancies.html')
+
+@app.route('/applicants')
+def applicants():
+    return render_template('applicants.html')
+
+@app.route('/calendar')
+def calendar():
+    return render_template('calendar.html')
+
+@app.route('/new_applicants')
+def new_applicants():
+    return render_template('new_applicants.html')
+
+@app.route('/job_openings')
+def job_openings():
+    return render_template('job_openings.html')
 
 @app.route('/logout')
 def logout():
     session.pop('username', None)
     return redirect(url_for('login'))
 
-@app.route('/post', methods=['POST'])
-def post():
-    if 'username' in session:
-        post_text = request.form['post']
-        posts.append({'author': session['username'], 'text': post_text})
-        return redirect(url_for('dashboard'))
-    return redirect(url_for('login'))
-
 if __name__ == '__main__':
     app.run()
-
-
-
-
-
-
-
-
-
-
-

@@ -2,42 +2,178 @@
 <html>
 <head>
     <title>Dashboard</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background-color: white;
+        }
+
+        .dashboard {
+            display: flex;
+            height: 100vh;
+        }
+
+        .left-column {
+            flex: 1;
+            background-color: #f7f4f4;
+            padding: 20px;
+        }
+
+        .main-content {
+            flex: 4;
+            padding: 20px;
+        }
+
+        .top-box {
+            background-color: rgb(241, 216, 220);
+            padding: 10px;
+        }
+
+        .center-box {
+            background-color: #f0f0f0;
+            padding: 10px;
+            margin-top: 20px;
+        }
+
+        .right-column {
+            flex: 1;
+            background-color: #f0f0f0;
+            padding: 20px;
+        }
+
+        .rectangle {
+            border: none;
+            border-radius: 5px;
+            padding: 10px;
+            background-color: white;
+            margin-bottom: 10px;
+        }
+
+        .icon {
+            display: inline-block;
+            margin-right: 10px;
+        }
+
+        .briefcase-icon:before {
+            content: '\1F4BC'; /* Unicode character for briefcase */
+        }
+
+        .people-icon:before {
+            content: '\1F464'; /* Unicode character for people profile */
+        }
+
+        .custom-button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: darkpink;
+            color: black;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            text-align: center;
+            text-decoration: none;
+            margin-right: 10px;
+        }
+
+        .button-container {
+            display: flex;
+            align-items: center;
+        }
+
+        /* Additional style for the calendar */
+        .calendar-container {
+            flex: 1;
+            background-color: #f0f0f0;
+            padding: 10px;
+            margin-top: 20px;
+            border-radius: 10px;
+        }
+
+        /* Styles for the calendar template */
+        .calendar {
+            width: 100%;
+            border: 1px solid #ccc;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+        .month {
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .days {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+        }
+        .day {
+            text-align: center;
+            padding: 5px;
+            border: 1px solid #ccc;
+        }
+        .event {
+            background-color: lightblue;
+            padding: 2px;
+            border-radius: 3px;
+        }
+    </style>
 </head>
-<body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: white;">
-    <div style="display: flex; height: 100vh;">
-        <!-- Left Column -->
-        <div style="flex: 1; background-color: #f0f0f0; padding: 20px;">
-            <h3>Dashboard Menu</h3>
+<body>
+    <div class="dashboard">
+        <div class="left-column">
+            <h3></h3>
             <a href="/vacancies" style="display: block; margin-bottom: 10px;">Vacancies</a>
             <a href="/applicants" style="display: block; margin-bottom: 10px;">Applicants</a>
             <a href="/calendar" style="display: block; margin-bottom: 10px;">Calendar</a>
         </div>
 
-        <!-- Main Content -->
-        <div style="flex: 4; padding: 20px;">
-            <!-- Top Box -->
-            <div style="background-color: #f0f0f0; padding: 10px;">
-                <h2>New Applicants</h2>
-                <a href="/new_applicants" style="display: inline-block; padding: 10px 20px; background-color: darkpink; color: black; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; text-align: center; text-decoration: none;">New Applicants Button</a>
-                <a href="/job_openings" style="display: inline-block; padding: 10px 20px; background-color: darkpink; color: black; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; text-align: center; text-decoration: none;">Job Opening Button</a>
-            </div>
-                
+        <div class="main-content">
+            <div class="top-box" style="border-radius: 10px;">
+                <p>Hello, {{ session['username'] }}</p>
 
-            <!-- Center Box -->
-            <div style="background-color: #f0f0f0; padding: 10px; margin-top: 20px;">
-                <h2>Top Matches</h2>
-                <div style="background-color: white; padding: 10px;">
-                    <!-- Content for Top Matches Box -->
+                <div class="button-container">
+                    <div class="rectangle" style="border-radius: 10px; margin-right: 10px;">
+                        <span class="icon people-icon"></span>
+                        <a href="/new_applicants" class="custom-button">New Applicants</a>
+                    </div>
+                    <div class="rectangle" style="border-radius: 10px; margin-right: 10px ;">
+                        <span class="icon briefcase-icon"></span>
+                        <a href="/job_openings" class="custom-button">Job Opening</a>
+                    </div>
+                </div>
+            </div>
+
+            <div style="display: flex; flex-wrap: wrap; justify-content: space-between;">
+                <!-- Center Box -->
+                <div style="flex: 1; background-color: #f0f0f0; padding: 10px; margin-top: 20px;margin-right: 20px; border-radius: 10px;">
+                    <h2>Top Matches</h2>
+                    <div style="background-color: white; padding: 10px; border-radius: 10px;">
+                        <!-- Content for Top Matches Box -->
+                    </div>
+                </div>
+            
+                <!-- Calendar -->
+                <div class="calendar-container">
+                    <h3>Calendar</h3>
+                    <div class="calendar">
+                        <div class="month">August 2023</div>
+                        <div class="days">
+                            <!-- ... Calendar days ... -->
+                            <!-- Sample event on August 5th -->
+                            <div class="day">
+                                5
+                                <div class="event">Meeting</div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-
-        <!-- Right Column -->
-        <div style="flex: 1; background-color: #f0f0f0; padding: 20px;">
-            <h3>Diary Schedule</h3>
-            <div style="background-color: white; padding: 10px;">
-                <!-- Content for Diary Schedule Box -->
-            </div>
+        
+        <div class="right-column">
+            <!-- ... Your right-column content ... -->
         </div>
     </div>
 </body>

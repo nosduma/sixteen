@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<source>
+  <!--publisher is applicable to ATS developers only-->
+  <publisher/>
+  <!--publisherurl is applicable to ATS developers only-->
+  <publisherurl/>
+  <job>
+    <title/>
+    <date/>
+    <referencenumber/>
+    <requisitionid/>
+    <url/>
+    <company/>
+    <sourcename/>
+    <city/>
+    <state/>
+    <country/>
+    <email/>
+    <postalcode/>
+    <description/>
+    <salary/>
+    <education/>
+    <jobtype/>
+    <category/>
+    <experience/>
+    <indeed-apply-data>
+      <![CDATA
+      [indeed-apply-apiToken=1234ABCDE&indeed-apply-jobTitle=
+      Professional+Basket+Weaver&indeed-apply-jobId=Sample+ID &indeed-apply-jobCompanyName=My+Favorite+Company
+      &indeed-apply-jobLocation=Austin+TX&indeed-apply-jobUrl=
+      http%3A%2F%2Fwww.indeed.com&indeed-apply-postUrl=
+      https%3A%2F%2Fhookb.in%2FPxOjJqJELNH8lZLZDkpz&indeed-apply-questions
+      =https%3A%2F%2Fpastebin.com%2Fraw%2F0vXq9q9b%23]]>
+    </indeed-apply-data>
+  </job>
+</source>

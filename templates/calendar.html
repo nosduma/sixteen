@@ -1,8 +1,67 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>calendar</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .calendar {
+            width: 300px;
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin: 20px auto;
+        }
+        .month {
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .days {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+        }
+        .day {
+            text-align: center;
+            padding: 5px;
+            border: 1px solid #ccc;
+        }
+        .event {
+            background-color: lightblue;
+            padding: 2px;
+            border-radius: 3px;
+        }
+    </style>
 </head>
 <body>
-    <h1>There will be a google calendar here</h1>
+
+<div class="calendar">
+    <div class="month">August 2023</div>
+    <div class="days">
+        <div class="day">Sun</div>
+        <div class="day">Mon</div>
+        <div class="day">Tue</div>
+        <div class="day">Wed</div>
+        <div class="day">Thu</div>
+        <div class="day">Fri</div>
+        <div class="day">Sat</div>
+        
+        <!-- Adjust the number of empty divs to match the starting day of the month -->
+        <div class="day"></div>
+        <div class="day"></div>
+        <div class="day"></div>
+        <div class="day"></div>
+        <div class="day"></div>
+        <div class="day">1</div>
+        <div class="day">2</div>
+        <!-- ... continue for the rest of the days -->
+        
+        <!-- Sample event on August 5th -->
+        <div class="day">
+            5
+            <div class="event">Meeting</div>
+        </div>
+    </div>
+</div>
+
 </body>
+</html>

@@ -1,8 +1,87 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>job_openings</title>
+    <title>Job Post Form</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: white;
+            color: black;
+        }
+
+        h2 {
+            color: black;
+        }
+
+        form {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid black;
+            border-radius: 5px;
+            background-color: white;
+        }
+
+        label {
+            font-weight: bold;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="url"],
+        input[type="date"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid black;
+            border-radius: 3px;
+        }
+
+        input[type="submit"] {
+            background-color: black;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
-    <h1>There will be job openings here</h1>
+    <h2>Job Post Form</h2>
+    <form action="/submit_job" method="post">
+        <label for="title">Job Title:</label>
+        <input type="text" id="title" name="title" required><br>
+
+        <label for="companysize">Company Size:</label>
+        <select id="companysize" name="companysize">
+            <option value="1 to 49">1 to 49</option>
+            <option value="50 to 149">50 to 149</option>
+            <option value="150 to 249">150 to 249</option>
+            <option value="250 to 499">250 to 499</option>
+            <option value="500 to 749">500 to 749</option>
+            <option value="750 to 999">750 to 999</option>
+            <option value="1000+">1000+</option>
+        </select><br>
+
+        <label for="companydescription">Company Description:</label>
+        <textarea id="companydescription" name="companydescription" rows="4"></textarea><br>
+
+        <label for="jobdescription">Job Description:</label>
+        <textarea id="jobdescription" name="jobdescription" rows="4" required></textarea><br>
+
+        <label for="minrequirements">Minimum Requirements:</label>
+        <textarea id="minrequirements" name="minrequirements" rows="4"></textarea><br>
+
+        <label for="qualifications">Qualifications:</label>
+        <textarea id="qualifications" name="qualifications" rows="4"></textarea><br>
+
+        <label for="additionalinfo">Additional Information:</label>
+        <textarea id="additionalinfo" name="additionalinfo" rows="4"></textarea><br>
+
+        <input type="submit" value="Submit Job">
+    </form>
 </body>
+</html>

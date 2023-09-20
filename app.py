@@ -57,7 +57,6 @@ def dashboard():
         return render_template('dashboard.html', username=session['username'])
     return redirect(url_for('login'))
 
-
 @app.route('/vacancies')
 def vacancies():
     return render_template('vacancies.html')
@@ -77,6 +76,10 @@ def new_applicants():
 @app.route('/job_openings')
 def job_openings():
     return render_template('job_openings.html')
+
+@app.route('/event')
+def event():
+    return render_template('event.html')  # You should customize this page to show event details
 
 @app.route('/logout')
 def logout():

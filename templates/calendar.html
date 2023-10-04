@@ -30,20 +30,43 @@
             padding: 2px;
             border-radius: 3px;
         }
+
+        /* Add custom styles to enhance the calendar */
+        .day.sun {
+            background-color: #f0e68c; /* Light Khaki */
+        }
+        .day.mon {
+            background-color: #ffffff; /* White */
+        }
+        .day.tue {
+            background-color: #add8e6; /* Light Blue */
+        }
+        .day.wed {
+            background-color: #ffcc99; /* Peach */
+        }
+        .day.thu {
+            background-color: #87ceeb; /* Sky Blue */
+        }
+        .day.fri {
+            background-color: #dda0dd; /* Plum */
+        }
+        .day.sat {
+            background-color: #ffffff; /* White */
+        }
     </style>
 </head>
 <body>
 
 <div class="calendar">
-    <div class="month">August 2023</div>
+    <div class="month" id="currentMonthYear"></div>
     <div class="days">
-        <div class="day">Sun</div>
-        <div class="day">Mon</div>
-        <div class="day">Tue</div>
-        <div class="day">Wed</div>
-        <div class="day">Thu</div>
-        <div class="day">Fri</div>
-        <div class="day">Sat</div>
+        <div class="day sun">Sun</div>
+        <div class="day mon">Mon</div>
+        <div class="day tue">Tue</div>
+        <div class="day wed">Wed</div>
+        <div class="day thu">Thu</div>
+        <div class="day fri">Fri</div>
+        <div class="day sat">Sat</div>
         
         <!-- Adjust the number of empty divs to match the starting day of the month -->
         <div class="day"></div>
@@ -62,6 +85,14 @@
         </div>
     </div>
 </div>
+
+<script>
+    // JavaScript to display the current month and year in the header
+    const currentDate = new Date();
+    const options = { year: 'numeric', month: 'long' };
+    const currentMonthYear = currentDate.toLocaleDateString('en-US', options);
+    document.getElementById('currentMonthYear').textContent = currentMonthYear;
+</script>
 
 </body>
 </html>

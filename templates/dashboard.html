@@ -126,7 +126,7 @@
             <h3></h3>
             <a href="/vacancies" style="display: block; margin-bottom: 10px;">Vacancies</a>
             <a href="/applicants" style="display: block; margin-bottom: 10px;">Applicants</a>
-            <a href="/calendar" style="display: block; margin-bottom: 10px;">Calendar</a>
+            <a href="/events" style="display: block; margin-bottom: 10px;">Events</a>
         </div>
 
         <div class="main-content">
@@ -138,7 +138,7 @@
                         <span class="icon people-icon"></span>
                         <a href="/new_applicants" class="custom-button">New Applicants</a>
                     </div>
-                    <div class="rectangle" style="border-radius: 10px; margin-right: 10px ;">
+                    <div class="rectangle" style="border-radius: 10px; margin-right: 10px;">
                         <span class="icon briefcase-icon"></span>
                         <a href="/job_openings" class="custom-button">Job Opening</a>
                     </div>
@@ -147,20 +147,95 @@
 
             <div style="display: flex; flex-wrap: wrap; justify-content: space-between;">
                 <!-- Center Box -->
-                <div style="flex: 1; background-color: #f0f0f0; padding: 10px; margin-top: 20px;margin-right: 20px; border-radius: 10px;">
+                <div style="flex: 1; background-color: #f0f0f0; padding: 10px; margin-top: 20px; margin-right: 20px; border-radius: 10px;">
                     <h2>Top Matches</h2>
                     <div style="background-color: white; padding: 10px; border-radius: 10px;">
                         <!-- Content for Top Matches Box -->
                     </div>
                 </div>
-            
-                <!-- Calendar -->
+
+                
+
+                Calendar
                 <div class="calendar-container">
-                    <h3>Calendar</h3>
+                    
+                        <style>
+                            body {
+                                font-family: Arial, sans-serif;
+                            }
+                            .calendar {
+                                width: 300px;
+                                border: 1px solid #ccc;
+                                padding: 10px;
+                                margin: 20px auto;
+                            }
+                            .month {
+                                text-align: center;
+                                font-weight: bold;
+                                margin-bottom: 10px;
+                            }
+                            .days {
+                                display: grid;
+                                grid-template-columns: repeat(7, 1fr);
+                            }
+                            .day {
+                                text-align: center;
+                                padding: 5px;
+                                border: 1px solid #ccc;
+                            }
+                            .event {
+                                background-color: lightblue;
+                                padding: 2px;
+                                border-radius: 3px;
+                            }
+                    
+                            /* Add custom styles to enhance the calendar */
+                            .day.sun {
+                                background-color: #f0e68c; /* Light Khaki */
+                            }
+                            .day.mon {
+                                background-color: #ffffff; /* White */
+                            }
+                            .day.tue {
+                                background-color: #add8e6; /* Light Blue */
+                            }
+                            .day.wed {
+                                background-color: #ffcc99; /* Peach */
+                            }
+                            .day.thu {
+                                background-color: #87ceeb; /* Sky Blue */
+                            }
+                            .day.fri {
+                                background-color: #dda0dd; /* Plum */
+                            }
+                            .day.sat {
+                                background-color: #ffffff; /* White */
+                            }
+                        </style>
+                    </head>
+                    <body>
+                    
                     <div class="calendar">
-                        <div class="month">August 2023</div>
+                        <div class="month" id="currentMonthYear"></div>
                         <div class="days">
-                            <!-- ... Calendar days ... -->
+                            <div class="day sun">Sun</div>
+                            <div class="day mon">Mon</div>
+                            <div class="day tue">Tue</div>
+                            <div class="day wed">Wed</div>
+                            <div class="day thu">Thu</div>
+                            <div class="day fri">Fri</div>
+                            <div class="day sat">Sat</div>
+                            
+                            <!-- Adjust the number of empty divs to match the starting day of the month -->
+                            <div class="day"></div>
+                            <div class="day"></div>
+                            <div class="day"></div>
+                            <div class="day"></div>
+                            <div class="day"></div>
+                            <div class="day">1</div>
+                            <div class="day">2</div>
+                            <!-- ... continue for the rest of the days -->
+                            
                             <!-- Sample event on August 5th -->
                             <div class="day">
                                 5
@@ -168,13 +243,106 @@
                             </div>
                         </div>
                     </div>
+                    
+                    <script>
+                        // JavaScript to display the current month and year in the header
+                        const currentDate = new Date();
+                        const options = { year: 'numeric', month: 'long' };
+                        const currentMonthYear = currentDate.toLocaleDateString('en-US', options);
+                        document.getElementById('currentMonthYear').textContent = currentMonthYear;
+                    </script>
+                    
                 </div>
+                    
+                      
+
+                <!-- Events Container -->
+                <div id="events-placeholder"></div>
             </div>
         </div>
-        
+
         <div class="right-column">
-            <!-- ... Your right-column content ... -->
+            <!-- ... Your right column content ... -->
         </div>
     </div>
+
+    <!-- ... Other HTML content ... -->
+
+
+
+    <!-- Add the script here -->
+    <script>
+        // JavaScript to auto-generate the current month
+        const monthNames = [
+            "January", "February", "March", "April", "May", "June",
+            "July", "August", "September", "October", "November", "December"
+        ];
+        const currentDate = new Date();
+        const currentMonth = monthNames[currentDate.getMonth()];
+        document.getElementById("current-month").textContent = currentMonth;
+
+        // Function to fetch events from the server
+        function fetchEvents() {
+            fetch("/get_events", {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Store events data in a variable
+                const eventsData = data;
+
+                // Function to render events on the calendar
+                function renderEventsOnCalendar() {
+                    const calendarDays = document.querySelectorAll(".day");
+
+                    // Loop through each calendar day and check for events
+                    calendarDays.forEach(dayElement => {
+                        const dayNumber = parseInt(dayElement.textContent);
+
+                        // Check if there are events for this day
+                        const eventsForDay = eventsData.filter(event => {
+                            const eventDate = new Date(event.event_date);
+                            return eventDate.getDate() === dayNumber;
+                        });
+
+                        // If there are events, render them on the calendar
+                        if (eventsForDay.length > 0) {
+                            const eventsContainer = document.createElement("div");
+                            eventsContainer.classList.add("events-container");
+
+                            eventsForDay.forEach(event => {
+                                const eventDiv = document.createElement("div");
+                                eventDiv.classList.add("event");
+                                eventDiv.textContent = event.event_name;
+
+                                // Add an event click handler to view event details
+                                eventDiv.addEventListener("click", () => {
+                                    // Here, you can implement the logic to display event details
+                                    alert(`Event Details: ${event.event_name} - ${event.event_description}`);
+                                });
+
+                                eventsContainer.appendChild(eventDiv);
+                            });
+
+                            dayElement.appendChild(eventsContainer);
+                        }
+                    });
+                }
+
+                // Call the function to render events on the calendar
+                renderEventsOnCalendar();
+            });
+        }
+
+        // Fetch events when the page loads
+        window.addEventListener("load", fetchEvents);
+    </script>
+</div>
+
+<!-- ... Other HTML content ... -->
+
 </body>
 </html>

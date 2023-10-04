@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Events</title>
+    <style>
+        /* Add your CSS styles here for color-coding */
+        .event-cell {
+            background-color: lightblue;
+            padding: 5px;
+            border: 1px solid #ccc;
+        }
+    </style>
+</head>
+<body>
+    <h1>Weekly Calendar</h1>
+    <table>
+        <tr>
+            <th>Sunday</th>
+            <th>Monday</th>
+            <th>Tuesday</th>
+            <th>Wednesday</th>
+            <th>Thursday</th>
+            <th>Friday</th>
+            <th>Saturday</th>
+        </tr>
+        <tr>
+            <!-- Replace this section with your code to generate the weekly calendar -->
+            <td class="event-cell">Event 1</td>
+            <td class="event-cell">Event 2</td>
+            <td></td>
+            <td class="event-cell">Event 3</td>
+            <td></td>
+            <td></td>
+            <td class="event-cell">Event 4</td>
+        </tr>
+        <!-- Add more rows as needed for the entire week -->
+    </table>
+
+    <h1>Calendar</h1>
+    <ul>
+        {% for event in events %}
+            <li>{{ event[1] }} - {{ event[2] }}: {{ event[3] }}</li>
+        {% endfor %}
+    </ul>
+    <h2>Add Event</h2>
+    <form action="/add_event" method="POST">
+        <label for="event_name">Event Name:</label>
+        <input type="text" id="event_name" name="event_name" required><br>
+        <label for="event_date">Event Date:</label>
+        <input type="date" id="event_date" name="event_date" required><br>
+        <label for="event_time">Event Time:</label>
+        <input type="time" id="event_time" name="event_time" required><br>
+        <label for="event_description">Event Description:</label>
+        <textarea id="event_description" name="event_description"></textarea><br>
+        <input type="submit" value="Add Event">
+    </form>
+</body>
+</html>

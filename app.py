@@ -1,4 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, session
+import sqlite3
+from flask import Flask, jsonify
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'  # Change this to a secure secret key in a real application
@@ -10,6 +12,59 @@ users = {
         'password': 'password1'
     }
 }
+
+# Define a function to create the events table
+def create_table():
+    conn = sqlite3.connect('calendar.db')
+    cursor = conn.cursor()
+
+    # Create a table to store calendar events
+    cursor.execute('''CREATE TABLE IF NOT EXISTS events
+                      (id INTEGER PRIMARY KEY AUTOINCREMENT,
+                       event_name TEXT,
+                       event_date DATE,
+                       event_description TEXT)''')
+
+    conn.commit()
+    conn.close()
+
+# Function to get events from the database
+def get_events():
+    conn = sqlite3.connect('calendar.db')
+    cursor = conn.cursor()
+    cursor.execute('SELECT * FROM events')
+    events = cursor.fetchall()
+    conn.close()
+    return events
+
+@app.route('/get_events', methods=['GET'])
+def fetch_events():
+    # Retrieve events from your database or source
+    events = get_events()
+
+    # Convert events to a JSON response using jsonify
+    response = jsonify(events=events)
+    
+    return response
+
+def insert_event(event_name, event_date, event_description):
+    conn = sqlite3.connect('calendar.db')
+    cursor = conn.cursor()
+    cursor.execute('INSERT INTO events (event_name, event_date, event_description) VALUES (?, ?, ?)',
+                   (event_name, event_date, event_description))
+    conn.commit()
+    conn.close()
+
+@app.route('/add_event', methods=['POST'])
+def add_event_route():
+    if request.method == 'POST':
+        event_name = request.form['event_name']
+        event_date = request.form['event_date']
+        event_description = request.form['event_description']
+        insert_event(event_name, event_date, event_description)  # Call the renamed function
+        return redirect(url_for('event'))
+
+
 
 @app.route('/')
 def home():
@@ -33,7 +88,7 @@ def register():
             'password': password
         }
         session['username'] = username
-        return redirect(url_for('login'))  # Redirect to login page after successful registration
+        return redirect(url_for('login'))
 
     return render_template('register.html')
 
@@ -45,7 +100,7 @@ def login():
 
         if username in users and users[username]['password'] == password:
             session['username'] = username
-            return redirect(url_for('dashboard'))  # Redirect to dashboard after successful login
+            return redirect(url_for('dashboard'))
         else:
             return render_template('login.html', message='Invalid username or password.')
 
@@ -54,8 +109,12 @@ def login():
 @app.route('/dashboard')
 def dashboard():
     if 'username' in session:
-        return render_template('dashboard.html', username=session['username'])
+        # Retrieve events from the database
+        events = get_events()
+        return render_template('dashboard.html', username=session['username'], events=events)
     return redirect(url_for('login'))
+
+
 
 @app.route('/vacancies')
 def vacancies():
@@ -67,7 +126,17 @@ def applicants():
 
 @app.route('/calendar')
 def calendar():
-    return render_template('calendar.html')
+    # You can create and populate the weekly calendar data here
+    # For simplicity, let's assume you have a list of events for the week
+
+    # Sample weekly events data (replace with your actual data)
+    weekly_events = [
+        ['Event 1', '2023-10-10', 'Description 1'],
+        ['Event 2', '2023-10-11', 'Description 2'],
+        # Add more events for the week
+    ]
+
+    return render_template('calendar.html', weekly_events=weekly_events)
 
 @app.route('/new_applicants')
 def new_applicants():
@@ -77,9 +146,9 @@ def new_applicants():
 def job_openings():
     return render_template('job_openings.html')
 
-@app.route('/event')
+@app.route('/events')
 def event():
-    return render_template('event.html')  # You should customize this page to show event details
+    return render_template('events.html')  # You should customize this page to show event details
 
 @app.route('/logout')
 def logout():
@@ -87,4 +156,4 @@ def logout():
     return redirect(url_for('login'))
 
 if __name__ == '__main__':
-    app.run()
+    app.run(debug=True)

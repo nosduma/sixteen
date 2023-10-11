@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online Diary</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #fff; /* White background */
+            color: #000; /* Black text */
+            margin: 0;
+            padding: 0;
+        }
+
+        h1, h2 {
+            font-weight: bold;
+        }
+
+        h1 {
+            font-size: 24px;
+        }
+
+        h2 {
+            font-size: 20px;
+        }
+
+        .container {
+            width: 50%;
+            margin: 0 auto;
+        }
+
+        .event-form {
+            border: 2px solid #000; /* Black border */
+            padding: 20px;
+            border-radius: 5px;
+        }
+
+        form {
+            margin-top: 20px;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        input[type="text"],
+        input[type="date"],
+        input[type="time"],
+        textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #000; /* Black border */
+            border-radius: 3px;
+        }
+
+        button[type="submit"] {
+            background-color: #000; /* Black background */
+            color: #fff; /* White text */
+            border: none;
+            padding: 10px 20px;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #333; /* Darker black on hover */
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        li {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .links {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .link {
+            color: #000; /* Black text for links */
+            text-decoration: none;
+        }
+
+        .link:hover {
+            text-decoration: underline;
+        }
+
+        .view-events-link {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .view-events-button {
+            margin-top: 10px;
+            display: inline-block;
+            background-color: #000; /* Black background */
+            color: #fff; /* White text */
+            border: none;
+            padding: 15px 30px; /* Adjust padding to make it big */
+            border-radius: 3px;
+            cursor: pointer;
+            font-weight: bold; /* Bold text */
+            text-decoration: none; /* Remove underlines for links */
+        }
+
+        .view-events-button:hover {
+            background-color: #333; /* Darker black on hover */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Welcome to Your Online Diary</h1>
+
+        <!-- Event Form -->
+        <div class="event-form">
+            <h2>Add Event</h2>
+            <form method="POST" action="/add_event">
+                <label for="event_name">Event Name:</label>
+                <input type="text" name="event_name" required><br>
+
+                <label for="event_date">Event Date:</label>
+                <input type="date" name="event_date" required><br>
+
+                <label for="event_time">Event Time:</label>
+                <input type="time" name="event_time" required><br>
+
+                <label for="event_description">Event Description:</label>
+                <textarea name="event_description" required></textarea><br>
+
+                <button type="submit">Add Event</button>
+            </form>
+        </div>
+
+        <!-- Flash Messages and View Events Link -->
+        <div class="links">
+            <!-- Flash Messages -->
+            <div class="flash-messages">
+                {% with messages = get_flashed_messages() %}
+                    {% if messages %}
+                        <h2>Flash Messages</h2>
+                        <ul>
+                            {% for message in messages %}
+                                <li>{{ message }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                {% endwith %}
+            </div>
+
+            <!-- View Events Link -->
+            <div class="view-events-link">
+                <!-- <h2>View Events</h2> -->
+                <a class="link view-events-button" href="/events"><strong>View Your Events</strong></a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,24 +1,27 @@
-from flask import Flask, render_template, request, redirect, url_for, session
+from flask import Flask, render_template, request, redirect, url_for, flash, session
 import sqlite3
-from flask import Flask, jsonify
+import hashlib
+from database import create_tables  # Import the create_tables function
+
+
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'  # Change this to a secure secret key in a real application
 
-# Dummy user data (for demonstration purposes)
-users = {
-    'user1': {
-        'username': 'user1',
-        'password': 'password1'
-    }
-}
+# # Dummy user data (for demonstration purposes)
+# users = {
+#     'user1': {
+#         'username': 'user1',
+#         'password': 'password1'
+#     }
+# }
 
-# Define a function to create the events table
+import sqlite3
+from database import create_tables
 def create_table():
     conn = sqlite3.connect('calendar.db')
     cursor = conn.cursor()
 
-    # Create a table to store calendar events
     cursor.execute('''CREATE TABLE IF NOT EXISTS events
                       (id INTEGER PRIMARY KEY AUTOINCREMENT,
                        event_name TEXT,
@@ -27,43 +30,6 @@ def create_table():
 
     conn.commit()
     conn.close()
-
-# Function to get events from the database
-def get_events():
-    conn = sqlite3.connect('calendar.db')
-    cursor = conn.cursor()
-    cursor.execute('SELECT * FROM events')
-    events = cursor.fetchall()
-    conn.close()
-    return events
-
-@app.route('/get_events', methods=['GET'])
-def fetch_events():
-    # Retrieve events from your database or source
-    events = get_events()
-
-    # Convert events to a JSON response using jsonify
-    response = jsonify(events=events)
-    
-    return response
-
-def insert_event(event_name, event_date, event_description):
-    conn = sqlite3.connect('calendar.db')
-    cursor = conn.cursor()
-    cursor.execute('INSERT INTO events (event_name, event_date, event_description) VALUES (?, ?, ?)',
-                   (event_name, event_date, event_description))
-    conn.commit()
-    conn.close()
-
-@app.route('/add_event', methods=['POST'])
-def add_event_route():
-    if request.method == 'POST':
-        event_name = request.form['event_name']
-        event_date = request.form['event_date']
-        event_description = request.form['event_description']
-        insert_event(event_name, event_date, event_description)  # Call the renamed function
-        return redirect(url_for('event'))
-
 
 
 @app.route('/')
@@ -74,46 +40,150 @@ def home():
 def about():
     return render_template('about.html')
 
+# Registration route
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
+        fullname = request.form['fullname']
         username = request.form['username']
+        companyname = request.form['companyname']
+        emailaddress = request.form['emailaddress']
+        jobtitle = request.form['jobtitle']
+        companyaddress = request.form['companyaddress']
+        
+        # Define 'password' and 'confirm_password' variables by extracting them from the form data
         password = request.form['password']
+        confirm_password = request.form['confirm_password']
 
-        if username in users:
-            return render_template('register.html', message='Username already taken.')
+        if password != confirm_password:
+            flash('Passwords do not match', 'error')
+        else:
+            password_hash = hashlib.sha256(password.encode()).hexdigest()
+            conn = get_db_connection()
+            
+            # Create the 'users' table if it doesn't exist
+            create_tables()
+            
+            conn.execute('INSERT INTO users (fullname, username, companyname, emailaddress, jobtitle, companyaddress, password_hash) VALUES (?, ?, ?, ?, ?, ?, ?)',
+                         (fullname, username, companyname, emailaddress, jobtitle, companyaddress, password_hash))
+            conn.commit()
+            conn.close()
+            flash('Registration successful!', 'success')
 
-        users[username] = {
-            'username': username,
-            'password': password
-        }
-        session['username'] = username
-        return redirect(url_for('login'))
+            return redirect(url_for('login'))
 
     return render_template('register.html')
 
+
+
+# Login route
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
 
-        if username in users and users[username]['password'] == password:
-            session['username'] = username
+        password_hash = hashlib.sha256(password.encode()).hexdigest()
+        conn = get_db_connection()
+        user = conn.execute('SELECT * FROM users WHERE username = ? AND password_hash = ?', (username, password_hash)).fetchone()
+        conn.close()
+
+        if user:
+            flash('Login successful!', 'success')
+            session['user_id'] = user['id']  # Store the user's ID in the session
             return redirect(url_for('dashboard'))
         else:
-            return render_template('login.html', message='Invalid username or password.')
+            flash('Invalid username or password', 'error')
 
     return render_template('login.html')
 
 @app.route('/dashboard')
 def dashboard():
-    if 'username' in session:
-        # Retrieve events from the database
-        events = get_events()
-        return render_template('dashboard.html', username=session['username'], events=events)
-    return redirect(url_for('login'))
+    # Check if the user is logged in
+    if 'user_id' not in session:
+        flash('You must log in first.', 'danger')
+        return redirect(url_for('login'))
 
+    # Render the dashboard template
+    return render_template('dashboard.html')
+
+def create_table():
+    conn = sqlite3.connect('calendar.db')
+    cursor = conn.cursor()
+
+    cursor.execute('''CREATE TABLE IF NOT EXISTS events
+                      (id INTEGER PRIMARY KEY AUTOINCREMENT,
+                       event_name TEXT,
+                       event_date DATE,
+                       event_description TEXT)''')
+
+    conn.commit()
+    conn.close()
+
+create_table()
+
+def get_db_connection():
+    if 'user_id' in session:
+        user_id = session['user_id']
+        db_name = f'user_{user_id}_db.sqlite'  # Unique database name for each user
+        conn = sqlite3.connect(db_name)
+        conn.row_factory = sqlite3.Row
+        return conn
+    else:
+        return None
+
+
+@app.route('/add_event', methods=['POST'])
+def add_event():
+    if request.method == 'POST':
+        event_name = request.form['event_name']
+        event_date = request.form['event_date']
+        event_description = request.form['event_description']
+
+        conn = sqlite3.connect('calendar.db')
+        cursor = conn.cursor()
+        cursor.execute('INSERT INTO events (event_name, event_date, event_description) VALUES (?, ?, ?)',
+                       (event_name, event_date, event_description))
+        conn.commit()
+        conn.close()
+
+        flash('Event added successfully!', 'success')
+
+    return redirect(url_for('index'))
+
+# Define event_css_class function
+def event_css_class(event):
+    if event[3] == 'SomeCondition':
+        return 'conditional-class'
+    else:
+        return 'default-class'
+
+# Function to get events from the database with pagination
+def get_events(page, per_page):
+    conn = sqlite3.connect('calendar.db')
+    cursor = conn.cursor()
+
+    offset = (page - 1) * per_page
+
+    cursor.execute('SELECT * FROM events LIMIT ? OFFSET ?', (per_page, offset))
+    events = cursor.fetchall()
+    
+    conn.close()
+    return events
+
+# In your route, make sure it's available in the context when rendering the template
+@app.route('/events')
+def events():
+    # Retrieve events from the database
+    page = request.args.get('page', 1, type=int)
+    per_page = 10  # Number of events per page
+
+    events = get_events(page, per_page)
+    return render_template('events.html', events=events, event_css_class=event_css_class, page=page)
+
+@app.route('/diary')
+def diary():
+    return render_template('diary.html')
 
 
 @app.route('/vacancies')
@@ -124,20 +194,6 @@ def vacancies():
 def applicants():
     return render_template('applicants.html')
 
-@app.route('/calendar')
-def calendar():
-    # You can create and populate the weekly calendar data here
-    # For simplicity, let's assume you have a list of events for the week
-
-    # Sample weekly events data (replace with your actual data)
-    weekly_events = [
-        ['Event 1', '2023-10-10', 'Description 1'],
-        ['Event 2', '2023-10-11', 'Description 2'],
-        # Add more events for the week
-    ]
-
-    return render_template('calendar.html', weekly_events=weekly_events)
-
 @app.route('/new_applicants')
 def new_applicants():
     return render_template('new_applicants.html')
@@ -145,10 +201,6 @@ def new_applicants():
 @app.route('/job_openings')
 def job_openings():
     return render_template('job_openings.html')
-
-@app.route('/events')
-def event():
-    return render_template('events.html')  # You should customize this page to show event details
 
 @app.route('/logout')
 def logout():

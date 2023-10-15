@@ -10,12 +10,14 @@
         <p class="error" style="color: red;">{{ message }}</p>
         {% endif %}
         <form action="/login" method="post" style="text-align: left;">
-            <label for="username" style="display: block; margin-bottom: 10px; color: #000;">Username:</label>
-            <input type="text" id="username" name="username" required style="width: 100%; padding: 10px; margin-bottom: 20px; border: 1px solid #000; background-color: #fff; color: #000;">
-            <label for="password" style="display: block; margin-bottom: 10px; color: #000;">Password:</label>
-            <input type="password" id="password" name="password" required style="width: 100%; padding: 10px; margin-bottom: 20px; border: 1px solid #000; background-color: #fff; color: #000;">
+            <label for="username" style="display: block; margin-bottom: 10px; color: #000;"> Username:</label>
+            <input type="text" id="username" name="username" required style="width: 100%; padding: 5px; margin-bottom: 20px; border: 1px solid #000; background-color: #fff; color: #000;">
+            <label for="password" style="display: block; margin-bottom: 10px; color: #000;"> Password:</label>
+            <input type="password" id="password" name="password" required style="width: 100%; padding: 5px; margin-bottom: 20px; border: 1px solid #000; background-color: #fff; color: #000;">
             <input type="submit" value="Login" style="background-color: #ff5959; color: #fff; padding: 10px 20px; border: none; cursor: pointer;">
         </form>
+        
+        
         <p style="color: #000;">Don't have an account? <a href="/register" style="color: #000; text-decoration: underline;">Register</a></p>
     </div>
 </body>

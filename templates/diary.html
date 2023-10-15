@@ -124,18 +124,18 @@
         <!-- Event Form -->
         <div class="event-form">
             <h2>Add Event</h2>
-            <form method="POST" action="/add_event">
-                <label for="event_name">Event Name:</label>
-                <input type="text" name="event_name" required><br>
+            <form action="{{ url_for('create_event') }}" method="POST">
+                <label for="title">Title:</label>
+                <input type="text" name="title" required><br>
+
+                <label for="description">Description:</label>
+                <input type="text" name="description" required><br>
 
                 <label for="event_date">Event Date:</label>
                 <input type="date" name="event_date" required><br>
 
                 <label for="event_time">Event Time:</label>
                 <input type="time" name="event_time" required><br>
-
-                <label for="event_description">Event Description:</label>
-                <textarea name="event_description" required></textarea><br>
 
                 <button type="submit">Add Event</button>
             </form>

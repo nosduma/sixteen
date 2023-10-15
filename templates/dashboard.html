@@ -27,12 +27,13 @@
         }
 
         .top-box {
-            background-color: rgb(241, 216, 220);
+            background-color: #ff5959;
             padding: 10px;
+            position: relative; /* To position the Logout button */
         }
 
         .center-box {
-            background-color: #f0f0f0;
+            background-color: #141313;
             padding: 10px;
             margin-top: 20px;
         }
@@ -83,6 +84,24 @@
             align-items: center;
         }
 
+        /* Logout button styles */
+        .logout-button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #312f2f;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            text-align: center;
+            text-decoration: none;
+            margin-right: 10px;
+            position: absolute;
+            top: 10px;
+            right: 20px; /* Adjust the right margin as needed */
+        }
+
         /* Additional style for the calendar */
         .calendar-container {
             flex: 1;
@@ -91,9 +110,6 @@
             margin-top: 20px;
             border-radius: 10px;
         }
-
-        
-        
     </style>
 </head>
 <body>
@@ -104,19 +120,21 @@
             <a href="/applicants" style="display: block; margin-bottom: 10px;">Applicants</a>
             <a href="/events" style="display: block; margin-bottom: 10px;">Events</a>
             <a href="/diary" style="display: block; margin-bottom: 10px;">Diary</a>
-
         </div>
 
         <div class="main-content">
             <div class="top-box" style="border-radius: 10px;">
                 <p>Hello, {{ session['username'] }}</p>
 
+                <!-- Logout button -->
+                <a href="/logout" class="logout-button">Logout</a>
+
                 <div class="button-container">
                     <div class="rectangle" style="border-radius: 10px; margin-right: 10px;">
                         <span class="icon people-icon"></span>
                         <a href="/new_applicants" class="custom-button">New Applicants</a>
                     </div>
-                    <div class="rectangle" style="border-radius: 10px; margin-right: 10px;">
+                    <div class "rectangle" style="border-radius: 10px; margin-right: 10px;">
                         <span class="icon briefcase-icon"></span>
                         <a href="/job_openings" class="custom-button">Job Opening</a>
                     </div>
@@ -131,6 +149,9 @@
                         <!-- Content for Top Matches Box -->
                     </div>
                 </div>
-                
-    </body>
+                <!-- Additional content goes here -->
+            </div>
+        </div>
+    </div>
+</body>
 </html>

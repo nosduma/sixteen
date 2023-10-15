@@ -1,46 +1,16 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, session
+from flask import Flask, render_template, request, redirect, url_for, session, flash
 import sqlite3
-import hashlib
-from database import create_tables  # Import the create_tables function
-
+from werkzeug.security import generate_password_hash, check_password_hash
 
 
 app = Flask(__name__)
-app.secret_key = 'your_secret_key'  # Change this to a secure secret key in a real application
-
-# # Dummy user data (for demonstration purposes)
-# users = {
-#     'user1': {
-#         'username': 'user1',
-#         'password': 'password1'
-#     }
-# }
-
-import sqlite3
-from database import create_tables
-def create_table():
-    conn = sqlite3.connect('calendar.db')
-    cursor = conn.cursor()
-
-    cursor.execute('''CREATE TABLE IF NOT EXISTS events
-                      (id INTEGER PRIMARY KEY AUTOINCREMENT,
-                       event_name TEXT,
-                       event_date DATE,
-                       event_description TEXT)''')
-
-    conn.commit()
-    conn.close()
+app.secret_key = 'your_secret_key'
 
 
 @app.route('/')
 def home():
     return render_template('home.html')
 
-@app.route('/about')
-def about():
-    return render_template('about.html')
-
-# Registration route
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
@@ -50,162 +20,163 @@ def register():
         emailaddress = request.form['emailaddress']
         jobtitle = request.form['jobtitle']
         companyaddress = request.form['companyaddress']
-        
-        # Define 'password' and 'confirm_password' variables by extracting them from the form data
         password = request.form['password']
-        confirm_password = request.form['confirm_password']
 
-        if password != confirm_password:
-            flash('Passwords do not match', 'error')
-        else:
-            password_hash = hashlib.sha256(password.encode()).hexdigest()
-            conn = get_db_connection()
-            
-            # Create the 'users' table if it doesn't exist
-            create_tables()
-            
-            conn.execute('INSERT INTO users (fullname, username, companyname, emailaddress, jobtitle, companyaddress, password_hash) VALUES (?, ?, ?, ?, ?, ?, ?)',
-                         (fullname, username, companyname, emailaddress, jobtitle, companyaddress, password_hash))
-            conn.commit()
-            conn.close()
-            flash('Registration successful!', 'success')
+        # Hash the password before storing it
+        password_hash = generate_password_hash(password)
 
-            return redirect(url_for('login'))
+        conn = sqlite3.connect('database.db')
+        cursor = conn.cursor()
+
+        cursor.execute("INSERT INTO users (fullname, username, companyname, emailaddress, jobtitle, companyaddress, password) VALUES (?, ?, ?, ?, ?, ?, ?)",
+                       (fullname, username, companyname, emailaddress, jobtitle, companyaddress, password_hash))
+        conn.commit()
+
+        conn.close()
+        return redirect(url_for('login'))
 
     return render_template('register.html')
 
 
 
-# Login route
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
 
-        password_hash = hashlib.sha256(password.encode()).hexdigest()
-        conn = get_db_connection()
-        user = conn.execute('SELECT * FROM users WHERE username = ? AND password_hash = ?', (username, password_hash)).fetchone()
+        conn = sqlite3.connect('database.db')
+        cursor = conn.cursor()
+
+        cursor.execute("SELECT * FROM users WHERE username COLLATE NOCASE=?", (username,))
+        user = cursor.fetchone()
+
         conn.close()
 
-        if user:
-            flash('Login successful!', 'success')
-            session['user_id'] = user['id']  # Store the user's ID in the session
+        if user and check_password_hash(user[7], password):
+            session['username'] = user[2]  # Store the username in the session
+            flash('Login successful', 'success')
             return redirect(url_for('dashboard'))
         else:
-            flash('Invalid username or password', 'error')
+            flash('Login failed', 'error')
 
     return render_template('login.html')
 
+
+
 @app.route('/dashboard')
 def dashboard():
-    # Check if the user is logged in
-    if 'user_id' not in session:
-        flash('You must log in first.', 'danger')
+    if 'username' in session:  # Check if username is in the session
+        username = session['username']
+
+        conn = sqlite3.connect('database.db')
+        cursor = conn.cursor()
+
+        cursor.execute("SELECT * FROM users WHERE username COLLATE NOCASE = ?", (username,))
+        user = cursor.fetchone()
+
+        conn.close()
+
+        if user:
+            return render_template('dashboard.html', username=username, user=user)
+        else:
+            return "User not found."
+    else:
         return redirect(url_for('login'))
 
-    # Render the dashboard template
-    return render_template('dashboard.html')
-
-def create_table():
-    conn = sqlite3.connect('calendar.db')
-    cursor = conn.cursor()
-
-    cursor.execute('''CREATE TABLE IF NOT EXISTS events
-                      (id INTEGER PRIMARY KEY AUTOINCREMENT,
-                       event_name TEXT,
-                       event_date DATE,
-                       event_description TEXT)''')
-
-    conn.commit()
-    conn.close()
-
-create_table()
-
-def get_db_connection():
-    if 'user_id' in session:
-        user_id = session['user_id']
-        db_name = f'user_{user_id}_db.sqlite'  # Unique database name for each user
-        conn = sqlite3.connect(db_name)
-        conn.row_factory = sqlite3.Row
-        return conn
-    else:
-        return None
 
 
-@app.route('/add_event', methods=['POST'])
-def add_event():
+@app.route('/diary', methods=['GET', 'POST'])
+def diary():
     if request.method == 'POST':
-        event_name = request.form['event_name']
+        title = request.form['title']
+        description = request.form['description']
         event_date = request.form['event_date']
-        event_description = request.form['event_description']
+        event_time = request.form['event_time']
 
-        conn = sqlite3.connect('calendar.db')
+        # Insert the event into the database
+        conn = sqlite3.connect('database.db')
         cursor = conn.cursor()
-        cursor.execute('INSERT INTO events (event_name, event_date, event_description) VALUES (?, ?, ?)',
-                       (event_name, event_date, event_description))
+        cursor.execute("INSERT INTO events (title, description, event_date, event_time) VALUES (?, ?, ?, ?)",
+                       (title, description, event_date, event_time))
         conn.commit()
         conn.close()
 
-        flash('Event added successfully!', 'success')
+        flash('Event added successfully', 'success')
 
-    return redirect(url_for('index'))
-
-# Define event_css_class function
-def event_css_class(event):
-    if event[3] == 'SomeCondition':
-        return 'conditional-class'
-    else:
-        return 'default-class'
-
-# Function to get events from the database with pagination
-def get_events(page, per_page):
-    conn = sqlite3.connect('calendar.db')
-    cursor = conn.cursor()
-
-    offset = (page - 1) * per_page
-
-    cursor.execute('SELECT * FROM events LIMIT ? OFFSET ?', (per_page, offset))
-    events = cursor.fetchall()
-    
-    conn.close()
-    return events
-
-# In your route, make sure it's available in the context when rendering the template
-@app.route('/events')
-def events():
-    # Retrieve events from the database
-    page = request.args.get('page', 1, type=int)
-    per_page = 10  # Number of events per page
-
-    events = get_events(page, per_page)
-    return render_template('events.html', events=events, event_css_class=event_css_class, page=page)
-
-@app.route('/diary')
-def diary():
     return render_template('diary.html')
 
+@app.route('/create_event', methods=['POST'])
+def create_event():
+    if request.method == 'POST':
+        # Retrieve event data from the form
+        title = request.form['title']
+        description = request.form['description']
+        event_date = request.form['event_date']
+        event_time = request.form['event_time']
 
-@app.route('/vacancies')
-def vacancies():
-    return render_template('vacancies.html')
+        # Get the current user's username from the session
+        username = session.get('username')
 
-@app.route('/applicants')
-def applicants():
-    return render_template('applicants.html')
+        # Fetch the user's ID (id) from the database based on their username
+        conn = sqlite3.connect('database.db')
+        cursor = conn.cursor()
+        cursor.execute("SELECT id FROM users WHERE username COLLATE NOCASE = ?", (username,))
+        user = cursor.fetchone()
 
-@app.route('/new_applicants')
-def new_applicants():
-    return render_template('new_applicants.html')
+        if user:
+            user_id = user[0]  # Extract the user_id (id) from the query result
 
-@app.route('/job_openings')
-def job_openings():
-    return render_template('job_openings.html')
+            # Create a connection to the SQLite database
+            cursor.execute("INSERT INTO events (username, title, description, event_date, event_time) VALUES (?, ?, ?, ?, ?)",
+                           (username, title, description, event_date, event_time))
+
+            # Commit the changes and close the database connection
+            conn.commit()
+            conn.close()
+
+            flash('Event created successfully!', 'success')
+            return redirect(url_for('events'))  # Redirect to events after creating the event
+        else:
+            flash('User not found', 'error')
+
+    flash('Please log in to create events.', 'error')
+    return redirect(url_for('login'))
+
+
+@app.route('/events', methods=['GET'])
+def events():
+    if 'username' in session:  # Check if the user is already logged in
+        # Get the username of the currently logged-in user
+        username = session['username']
+        
+        # Create a connection to the SQLite database
+        conn = sqlite3.connect('database.db')
+        cursor = conn.cursor()
+
+        # Execute an SQL query to retrieve events associated with the current user
+        cursor.execute("SELECT title, description, event_date, event_time FROM events WHERE username COLLATE NOCASE = ?", (username,))
+        
+        # Fetch all events from the cursor
+        events = cursor.fetchall()
+
+        # Close the database connection
+        conn.close()
+
+        return render_template('events.html', events=events)
+    else:
+        flash('Please log in to access the events.', 'error')
+        return redirect(url_for('login', next='events'))
+
+
+
 
 @app.route('/logout')
 def logout():
-    session.pop('username', None)
+    session.pop('user', None)
     return redirect(url_for('login'))
+
 
 if __name__ == '__main__':
     app.run(debug=True)
